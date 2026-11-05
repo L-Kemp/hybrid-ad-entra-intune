@@ -43,3 +43,16 @@ Demonstrate hands-on technical experience with hybrid Microsoft infrastructure, 
 The following screenshot confirms successful hybrid Microsoft Entra join, TPM protection, and cloud device authentication.
 
 ![Hybrid Join Verification](screenshots/hybrid-join-verification.png)
+
+## Intune Enrollment and Compliance Verification
+
+The Windows 11 Enterprise endpoint was successfully enrolled in Microsoft Intune and classified as a corporate-managed device.
+
+The Intune admin center confirms:
+- Device compliance: **Compliant**
+- Device ownership: **Corporate**
+- Management platform: **Microsoft Intune**
+- Configuration policies: **1 succeeded**
+- Compliance policies: **2 compliant**
+
+![Intune Enrollment and Compliance Verification](screenshots/intune-enrollment-compliance.png)
