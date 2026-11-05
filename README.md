@@ -56,3 +56,19 @@ The Intune admin center confirms:
 - Compliance policies: **2 compliant**
 
 ![Intune Enrollment and Compliance Verification](screenshots/intune-enrollment-compliance.png)
+
+## Microsoft Edge SmartScreen Policy Verification
+
+Deployed a Microsoft Edge SmartScreen security configuration
+through Microsoft Intune and verified enforcement on the
+Windows 11 Enterprise endpoint.
+
+**Verification results:**
+- Policy: SmartScreenEnabled
+- Value: true
+- Source: Platform
+- Applies to: Device
+- Level: Mandatory
+- Status: OK
+
+![Edge SmartScreen Policy Verification](screenshots/edge-smartscreen-policy.png)
