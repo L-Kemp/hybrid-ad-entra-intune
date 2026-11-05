@@ -72,3 +72,18 @@ Windows 11 Enterprise endpoint.
 - Status: OK
 
 ![Edge SmartScreen Policy Verification](screenshots/edge-smartscreen-policy.png)
+
+## Windows Firewall Compliance Verification
+
+Configured a Microsoft Intune compliance policy requiring
+Windows Firewall to be enabled.
+
+Verified the endpoint firewall configuration using PowerShell.
+
+**Results:**
+- Domain: Enabled
+- Private: Enabled
+- Public: Enabled
+- Intune compliance policy: Compliant
+
+![Windows Firewall Verification](screenshots/windows-firewall-verification.png)
