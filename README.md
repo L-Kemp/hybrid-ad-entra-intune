@@ -37,3 +37,9 @@ The project demonstrates practical experience with identity synchronization, Win
 
 ## Purpose
 Demonstrate hands-on technical experience with hybrid Microsoft infrastructure, endpoint administration, and security management relevant to enterprise IT support and systems administration.
+
+## Hybrid Join Verification
+
+The following screenshot confirms successful hybrid Microsoft Entra join, TPM protection, and cloud device authentication.
+
+![Hybrid Join Verification](screenshots/hybrid-join-verification.png)
