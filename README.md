@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/34453916/README.md)
 # Hybrid Active Directory, Microsoft Entra ID & Intune Deployment
 
 ## Project Overview
@@ -97,7 +96,7 @@ No definitive cause for the lack of automatic encryption was established. To com
 Encryption was initiated using the existing protectors:
 
 ```powershell
-manage-bde -on C: -UsedSpaceOnly -EncryptionMethod xts_aes256 -SkipHardwareTest
+manage-bde -on C: -em xts_aes256 -usedspaceonly
 manage-bde -status C:
 ```
 
@@ -114,7 +113,7 @@ manage-bde -status C:
 
 ![BitLocker Encryption Status](screenshots/bitlocker-encryption-status.png)
 
-### Recovery-password backup and rotation
+### Recovery-password backup and protector replacement
 
 Verified recovery-password escrow under the Windows 11 computer object in AD DS using the BitLocker Recovery tab. After the initial recovery password was exposed during troubleshooting, created a replacement recovery-password protector, backed it up to AD DS, verified the new record, and removed the original protector. Deleted the obsolete AD DS recovery object only after confirming the replacement was active and stored.
 
