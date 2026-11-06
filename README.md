@@ -1,232 +1,144 @@
+[README.md](https://github.com/user-attachments/files/34453916/README.md)
 # Hybrid Active Directory, Microsoft Entra ID & Intune Deployment
 
 ## Project Overview
-Designed and configured a hybrid identity and endpoint management environment integrating on-premises Active Directory with Microsoft Entra ID and Microsoft Intune.
 
-The project demonstrates practical experience with identity synchronization, Windows device management, Group Policy, and endpoint security.
+Designed and configured a hybrid identity and endpoint management environment integrating on-premises Active Directory Domain Services (AD DS), Microsoft Entra ID, and Microsoft Intune. Implemented identity synchronization, hybrid device join, automatic MDM enrollment, endpoint security and compliance policies, and BitLocker encryption with recovery-password escrow to AD DS.
+
+The environment uses Windows Server 2022 and a Windows 11 Enterprise virtual machine in VMware Workstation. The project demonstrates hands-on experience with enterprise identity, endpoint administration, PowerShell troubleshooting, and security controls.
 
 ## Technologies Used
-- Windows Server 2022
-- Active Directory Domain Services (AD DS)
-- DNS and Group Policy
-- Microsoft Entra Connect Sync
-- Microsoft Entra ID
-- Microsoft Intune
-- Windows 11 Enterprise
-- VMware Workstation
+
+- Windows Server 2022; Active Directory Domain Services (AD DS); DNS; Group Policy
+- Microsoft Entra Connect Sync and Microsoft Entra ID
+- Microsoft Intune (device enrollment, configuration, compliance, endpoint security)
+- Windows 11 Enterprise; VMware Workstation Pro
+- Microsoft Edge SmartScreen; Windows Firewall
+- BitLocker Drive Encryption; virtual TPM 2.0; PowerShell; `manage-bde`
 
 ## Implementation
-- Configured Active Directory and DNS services.
-- Implemented identity synchronization between on-premises AD and Microsoft Entra ID.
-- Configured hybrid Microsoft Entra join for a Windows 11 Enterprise device.
-- Enabled automatic Intune enrollment using Group Policy.
-- Created and assigned an Intune device configuration profile.
-- Deployed Microsoft Defender SmartScreen settings.
-- Configured and verified a Windows Firewall compliance policy.
 
-## Validation
-- Verified hybrid device join using `dsregcmd /status`.
-- Confirmed Microsoft Defender SmartScreen enforcement through `edge://policy`.
-- Verified Windows Firewall status using PowerShell.
-- Confirmed successful device enrollment and compliance reporting in Microsoft Intune.
+1. Configured Active Directory and DNS services on Windows Server 2022.
+2. Implemented on-premises AD identity synchronization with Microsoft Entra ID using Entra Connect Sync.
+3. Configured hybrid Microsoft Entra join for a Windows 11 Enterprise endpoint.
+4. Enabled automatic Microsoft Intune enrollment through Group Policy.
+5. Created and assigned Intune device configuration and compliance policies.
+6. Deployed and verified Microsoft Edge SmartScreen settings and Windows Firewall compliance.
+7. Configured an Intune BitLocker disk encryption policy; created TPM and recovery-password protectors; backed up recovery information to AD DS; and encrypted the OS drive.
+8. Verified local BitLocker protection and subsequent Intune encryption reporting.
 
-## Project Status
-**Completed:** Hybrid identity synchronization, device enrollment, security configuration, and compliance verification.
+## Validation Summary
 
-**Planned:** BitLocker encryption management, recovery-key escrow, and additional endpoint security configurations.
-
-## Purpose
-Demonstrate hands-on technical experience with hybrid Microsoft infrastructure, endpoint administration, and security management relevant to enterprise IT support and systems administration.
+| Control | Verification | Result |
+|---|---|---|
+| Hybrid Microsoft Entra join | `dsregcmd /status` | Verified |
+| Intune enrollment | Intune device overview | Corporate-managed, compliant |
+| Edge SmartScreen | `edge://policy` | `SmartScreenEnabled = true`, mandatory |
+| Windows Firewall | PowerShell and Intune compliance | Domain, Private, Public enabled; compliant |
+| BitLocker | `manage-bde -status C:` | 100% used-space-only encrypted, XTS-AES 256, Protection On |
+| BitLocker protectors | `Get-BitLockerVolume` | TPM and RecoveryPassword |
+| Recovery escrow | ADUC BitLocker Recovery tab | Active recovery-password record verified in AD DS |
+| Encryption reporting | Intune device details | `Encrypted: Yes` |
 
 ## Hybrid Join Verification
 
-The following screenshot confirms successful hybrid Microsoft Entra join, TPM protection, and cloud device authentication.
+Verified successful hybrid Microsoft Entra join and cloud device authentication using `dsregcmd /status`.
 
 ![Hybrid Join Verification](screenshots/hybrid-join-verification.png)
 
 ## Intune Enrollment and Compliance Verification
 
-The Windows 11 Enterprise endpoint was successfully enrolled in Microsoft Intune and classified as a corporate-managed device.
-
-The Intune admin center confirms:
-- Device compliance: **Compliant**
-- Device ownership: **Corporate**
-- Management platform: **Microsoft Intune**
-- Configuration policies: **1 succeeded**
-- Compliance policies: **2 compliant**
+Enrolled the Windows 11 Enterprise endpoint in Microsoft Intune and verified corporate ownership and compliance. The original enrollment screenshot documents the earlier configuration state; subsequent checks confirmed **two configuration policies succeeded** and **two compliance policies were compliant**.
 
 ![Intune Enrollment and Compliance Verification](screenshots/intune-enrollment-compliance.png)
 
 ## Microsoft Edge SmartScreen Policy Verification
 
-Deployed a Microsoft Edge SmartScreen security configuration
-through Microsoft Intune and verified enforcement on the
-Windows 11 Enterprise endpoint.
+Deployed Microsoft Edge SmartScreen configuration through Intune and confirmed enforcement using `edge://policy`:
 
-**Verification results:**
-- Policy: SmartScreenEnabled
-- Value: true
-- Source: Platform
-- Applies to: Device
-- Level: Mandatory
-- Status: OK
+- Policy: `SmartScreenEnabled`
+- Value: `true`
+- Source: Platform; applies to Device
+- Level: Mandatory; status: OK
 
 ![Edge SmartScreen Policy Verification](screenshots/edge-smartscreen-policy.png)
 
 ## Windows Firewall Compliance Verification
 
-Configured a Microsoft Intune compliance policy requiring
-Windows Firewall to be enabled.
-
-Verified the endpoint firewall configuration using PowerShell.
-
-**Results:**
-- Domain: Enabled
-- Private: Enabled
-- Public: Enabled
-- Intune compliance policy: Compliant
+Configured an Intune compliance policy requiring Windows Firewall. Verified the **Domain**, **Private**, and **Public** firewall profiles were enabled, and confirmed Intune reported the device compliant.
 
 ![Windows Firewall Verification](screenshots/windows-firewall-verification.png)
 
-# BitLocker Encryption and Recovery Key Management
+## BitLocker Encryption and Recovery Key Management
 
-## Project Overview
+### Policy configuration
 
-Implemented and verified BitLocker drive encryption on a hybrid Microsoft Entra-joined Windows 11 Enterprise virtual machine managed through Microsoft Intune.
+Created the Intune Endpoint security → Disk encryption policy `WIN11 - BitLocker Encryption - Test`, assigned to the `Intune-Test-Devices` group. Configured:
 
-Configured endpoint encryption policies, TPM-based protection, and Active Directory Domain Services (AD DS) recovery password storage. Troubleshot encryption deployment and verified device encryption status through Windows PowerShell, Active Directory, and the Microsoft Intune admin center.
+- Required device encryption; **XTS-AES 256-bit** for OS drives; **used-space-only** encryption
+- TPM-based startup protection and a required 48-digit recovery password
+- Recovery information backup to on-premises **AD DS**, required before encryption
+- Recovery password rotation settings for Microsoft Entra-joined and hybrid-joined devices
 
-## Environment
+The VM's TPM readiness, UEFI Secure Boot, automatic encryption prerequisites, hybrid join, and AD DS connectivity were verified before encryption.
 
-| Component | Configuration |
+### Deployment and troubleshooting
+
+Intune successfully delivered the BitLocker policy, but **policy success did not initially result in drive encryption**. Local checks showed `FullyDecrypted`, `Protection Off`, and no protectors. Troubleshooting included:
+
+- Checking BitLocker state with `Get-BitLockerVolume` and `manage-bde -status C:`
+- Reviewing BitLocker and DeviceManagement-Enterprise-Diagnostics-Provider event logs
+- Verifying MDM policy values under `HKLM:\SOFTWARE\Microsoft\PolicyManager\current\device\BitLocker`
+- Inspecting applied Group Policy with `gpresult` for potential conflicts
+- Confirming TPM readiness, Secure Boot, domain secure-channel connectivity, and recovery policy settings
+
+No definitive cause for the lack of automatic encryption was established. To complete the deployment, TPM and recovery-password protectors were created manually. The recovery password was backed up to AD DS and verified in Active Directory Users and Computers **before encryption was enabled**.
+
+Encryption was initiated using the existing protectors:
+
+```powershell
+manage-bde -on C: -UsedSpaceOnly -EncryptionMethod xts_aes256 -SkipHardwareTest
+manage-bde -status C:
+```
+
+### Encryption verification
+
+| Setting | Verified result |
 |---|---|
-| Client OS | Windows 11 Enterprise |
-| Server OS | Windows Server 2022 |
-| Virtualization | VMware Workstation Pro |
-| Identity | Active Directory Domain Services and Microsoft Entra ID |
-| Device management | Microsoft Intune |
-| Device join | Hybrid Microsoft Entra joined |
-| Encryption | BitLocker XTS-AES 256-bit |
-| Hardware security | Virtual TPM 2.0 |
-| Recovery management | Active Directory Domain Services |
-
-## Implementation
-
-### 1. Configured Microsoft Intune BitLocker Policy
-
-Created and assigned an endpoint security disk encryption policy:
-
-**Policy:** `WIN11 - BitLocker Encryption - Test`
-
-Configuration included:
-
-- Require device encryption
-- XTS-AES 256-bit encryption for operating system drives
-- Used-space-only encryption
-- TPM-based operating system drive protection
-- Require a 48-digit recovery password
-- Store recovery information in Active Directory Domain Services
-- Require AD DS recovery information storage before enabling encryption
-- Recovery password rotation policy for Microsoft Entra-joined and hybrid-joined devices
-
-Assigned the policy to the `Intune-Test-Devices` group containing the Windows 11 Enterprise VM.
-
-### 2. Verified Policy Deployment
-
-Confirmed that the device received its BitLocker configuration through Microsoft Intune.
-
-Validated policy settings through the Windows registry and monitored Intune device check-in and configuration policy status.
-
-The BitLocker policy eventually reported successful deployment.
-
-### 3. Troubleshot Encryption Initialization
-
-Although Intune successfully delivered the configuration, the operating system drive initially remained unencrypted.
-
-Investigated the issue using:
-
-- `Get-BitLockerVolume`
-- `manage-bde -status`
-- Windows Event Viewer
-- MDM policy registry settings
-- Group Policy Results (`gpresult`)
-- TPM readiness checks
-
-Confirmed that the device's TPM was operational and that the BitLocker configuration had been received.
-
-Because automatic encryption had not started, completed encryption initialization manually while retaining the configured security requirements.
-
-### 4. Configured Recovery Password Protection
-
-Verified TPM key protection and created a BitLocker recovery password protector.
-
-Backed up recovery password information to Active Directory Domain Services.
-
-Used the BitLocker Recovery Password Viewer in Active Directory Users and Computers to verify successful recovery information storage.
-
-### 5. Enabled Operating System Drive Encryption
-
-Initiated used-space-only encryption using the configured XTS-AES 256-bit algorithm.
-
-Monitored encryption progress and confirmed successful completion.
-
-**Final local verification:**
-
-| Setting | Result |
-|---|---|
-| Operating system drive | C: |
-| Encryption progress | 100% |
-| Encryption method | XTS-AES 256 |
+| Operating system volume | `C:` |
 | Conversion status | Used Space Only Encrypted |
+| Percentage encrypted | 100% |
+| Encryption method | XTS-AES 256 |
 | Protection status | On |
-| Key protectors | TPM and Recovery Password |
+| Active protectors | TPM and RecoveryPassword |
 
-### 6. Verified Recovery Information in Active Directory
+![BitLocker Encryption Status](screenshots/bitlocker-encryption-status.png)
 
-Located the Windows 11 computer object in Active Directory Users and Computers.
+### Recovery-password backup and rotation
 
-Confirmed that BitLocker recovery information was stored under the computer object and accessible through the BitLocker Recovery tab.
+Verified recovery-password escrow under the Windows 11 computer object in AD DS using the BitLocker Recovery tab. After the initial recovery password was exposed during troubleshooting, created a replacement recovery-password protector, backed it up to AD DS, verified the new record, and removed the original protector. Deleted the obsolete AD DS recovery object only after confirming the replacement was active and stored.
 
-Verified the active recovery password protector against its corresponding AD DS recovery object.
+**Do not publish recovery passwords.** Any ADUC screenshots should show only redacted recovery records or password IDs.
 
-Removed an obsolete recovery information object after confirming the active protector and its associated recovery information.
+![BitLocker Recovery in Active Directory](screenshots/bitlocker-ad-recovery.png)
 
-### 7. Verified Microsoft Intune Encryption Reporting
+### Intune encryption reporting
 
-Following encryption completion, Microsoft Intune initially reported the device as unencrypted.
+Immediately after local encryption completed, Intune still displayed `Encrypted: No`. After device synchronization and a subsequent check-in, Intune reported **`Encrypted: Yes`** while the device remained compliant. This demonstrated the distinction between **policy application**, **actual disk encryption**, and **cloud reporting**.
 
-Performed a device synchronization and allowed updated device information to be reported.
+![Intune Encryption Verification](screenshots/intune-bitlocker-verification.png)
 
-**Final Intune results:**
+## Project Outcome
 
-- Device enrollment: Successful
-- Configuration policies: Succeeded
-- Device compliance: Compliant
-- Device encryption status: **Yes**
-- Last verified check-in: November 5, 2026, 3:53 PM
+Completed hybrid identity synchronization, device enrollment, endpoint security and compliance configuration, and BitLocker encryption with AD DS recovery-password escrow. Validated encryption both locally and through Intune device reporting.
 
-## Troubleshooting Experience
+**Skills demonstrated:** Active Directory, Microsoft Entra ID, Entra Connect Sync, Microsoft Intune, Group Policy, Windows Server, Windows 11, PowerShell, endpoint security, TPM-based BitLocker protection, recovery-key management, and systematic troubleshooting.
 
-This implementation involved diagnosing several configuration and reporting issues:
+**BitLocker implementation verified:** November 5, 2026.
 
-- BitLocker policy applied without automatically initiating encryption
-- Differences between successful policy deployment and actual drive encryption
-- Recovery password protector creation and verification
-- Active Directory recovery password backup and object management
-- Delayed encryption status reporting in Microsoft Intune
+## Security and Documentation Notes
 
-Resolved these issues through PowerShell diagnostics, local BitLocker management, Active Directory administration, and Intune device synchronization.
-
-## Outcome
-
-Successfully encrypted and secured a hybrid Microsoft Entra-joined Windows 11 Enterprise endpoint using BitLocker and Microsoft Intune policy configuration.
-
-Verified TPM-based protection, AD DS recovery password storage, successful encryption, and accurate Intune device reporting.
-
-**Technical skills demonstrated:** Microsoft Intune, BitLocker, Microsoft Entra ID, Active Directory Domain Services, Windows Server 2022, Windows 11 Enterprise, PowerShell, Group Policy troubleshooting, TPM 2.0, endpoint encryption, recovery key management, and device compliance monitoring.
-
-## Security Considerations
-
-Recovery passwords and other sensitive authentication information are excluded from public documentation. Screenshots should conceal recovery passwords, tenant identifiers, and other sensitive environment details.
-
-**Implementation completed:** November 5, 2026.
+- Never commit BitLocker recovery passwords, credentials, tokens, or unredacted recovery screenshots to a public repository.
+- Review screenshots for sensitive tenant, user, and device identifiers before publishing.
+- AD DS recovery-password escrow was verified; **Microsoft Entra ID recovery-key escrow was not independently verified** in this implementation.
+- Screenshot links above are relative paths. Add appropriately named, sanitized images to the repository's `screenshots/` directory.
