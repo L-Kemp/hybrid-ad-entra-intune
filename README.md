@@ -143,3 +143,9 @@ I connected my local Active Directory to Microsoft Entra ID, enrolled my Windows
 - Cover tenant, user, and device details in screenshots before uploading them.
 - I verified the recovery password backup in Active Directory (AD DS). Recovery-key backup to Microsoft Entra ID remains unverified.
 - The screenshot links point to files in the repository’s `screenshots/` folder. Use the filenames shown in the links when uploading redacted images.
+
+## Win32 App Deployment with Intune
+
+I packaged **7-Zip 26.06 (x64)** as an `.intunewin` file and assigned it as a required app for my Windows 11 Enterprise VM. I set it up to install silently and used a file-based detection rule so Intune could check whether it was installed.
+
+While checking the deployment, I found that my VM was still using the domain controller’s old VMware NAT address for DNS. I switched it to the domain controller’s host-only IP and verified that the VM could resolve Active Directory records and reach Microsoft over HTTPS. I confirmed 7-Zip was present on the VM and that Intune showed **Installed** under **Device install status**.
