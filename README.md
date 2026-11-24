@@ -181,6 +181,8 @@ I configured the script to run using the SYSTEM account with 64-bit PowerShell.
 - Domain, Private, and Public Firewall: Enabled
 - Intune Management Extension: Running
 
+![Successful remote PowerShell execution through Microsoft Intune](screenshots/intune-powershell-health-check.png)
+
 The script also saved a report locally, which I opened in PowerShell to verify the results.
 
 **Completed:** November 23, 2026.
