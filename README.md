@@ -164,6 +164,8 @@ I then removed the Uninstall assignment, restored the Required assignment, and v
 - Redeployment: Successful
 - Final Intune device status: Installed
 
+![Successful 7-Zip redeployment through Microsoft Intune](screenshots/intune-7zip-reinstallation-notification.png)
+
 ## Remote PowerShell Script Deployment
 
 I created a PowerShell script called `WIN11 - Endpoint Health Check` and deployed it through Intune to check the health of my Windows 11 Enterprise VM.
