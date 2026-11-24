@@ -149,3 +149,36 @@ I connected my local Active Directory to Microsoft Entra ID, enrolled my Windows
 I packaged **7-Zip 26.06 (x64)** as an `.intunewin` file and assigned it as a required app for my Windows 11 Enterprise VM. I set it up to install silently and used a file-based detection rule so Intune could check whether it was installed.
 
 While checking the deployment, I found that my VM was still using the domain controller’s old VMware NAT address for DNS. I switched it to the domain controller’s host-only IP and verified that the VM could resolve Active Directory records and reach Microsoft over HTTPS. I confirmed 7-Zip was present on the VM and that Intune showed **Installed** under **Device install status**.
+
+## Win32 Application Lifecycle Management
+
+I used Microsoft Intune to manage the installation and removal of 7-Zip 26.06 on my Windows 11 Enterprise VM.
+
+After the first successful deployment, I removed the Required assignment and assigned the application for uninstallation. Intune removed 7-Zip from the VM.
+
+I then removed the Uninstall assignment, restored the Required assignment, and verified that Intune installed 7-Zip again.
+
+**Results:**
+- Initial installation: Successful
+- Remote uninstallation: Successful
+- Redeployment: Successful
+- Final Intune device status: Installed
+
+## Remote PowerShell Script Deployment
+
+I created a PowerShell script called `WIN11 - Endpoint Health Check` and deployed it through Intune to check the health of my Windows 11 Enterprise VM.
+
+The script checked whether 7-Zip was installed, whether all three Windows Firewall profiles were enabled, and whether the Intune Management Extension service was running.
+
+I configured the script to run using the SYSTEM account with 64-bit PowerShell.
+
+**Results:**
+- Intune script execution: Succeeded
+- Device: `DESKTOP-90FTT4M`
+- 7-Zip: Installed
+- Domain, Private, and Public Firewall: Enabled
+- Intune Management Extension: Running
+
+The script also saved a report locally, which I opened in PowerShell to verify the results.
+
+**Completed:** November 23, 2026.
